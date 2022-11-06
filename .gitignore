@@ -24,3 +24,5 @@ discord_bot-*.tar
 
 # Temporary files, for example, from tests.
 /tmp/
+
+.env
