@@ -5,6 +5,11 @@ defmodule DiscordBot.WebTest do
 
   defp stub_body(body) do
     :hackney
+    # Prevent all traffic.
+    |> stub(:request, fn :get, _, _, "", [] ->
+      {:ok, 200, "headers", :client}
+    end)
+    # Make body return what's asked for.
     |> stub(:body, fn _, _ ->
       {:ok, body}
     end)
