@@ -1,24 +1,26 @@
 defmodule DiscordBot.WebTest do
-  use ExUnit.Case, async: true
-  use Mimic
+  use ExUnit.Case
   doctest DiscordBot.Web
-
-  defp stub_body(body) do
-    :hackney
-    # Prevent all traffic.
-    |> stub(:request, fn :get, _, _, "", [] ->
-      {:ok, 200, "headers", :client}
-    end)
-    # Make body return what's asked for.
-    |> stub(:body, fn _, _ ->
-      {:ok, body}
-    end)
+  use TypeCheck.ExUnit
+  setup do
+    bypass = Bypass.open()
+    Application.put_env(:discord_bot, :discord_base_url, endpoint_url(bypass.port))
+    bypass |> stub_gateway("wss://example.com/ws")
+    {:ok, bypass: bypass}
   end
 
-  test "fetch_websocket_url gets a url" do
-    stub_body('{"url": "wss://example.com/ws"}')
+  spectest DiscordBot.Web
 
+  test "fetch_websocket_url gets a url" do
     result = DiscordBot.Web.fetch_websocket_url()
     assert result == "wss://example.com/ws"
   end
+
+  defp stub_gateway(bypass, gateway) do
+    Bypass.expect(bypass, "GET", "/gateway", fn conn ->
+      Plug.Conn.resp(conn, 200, ~s<{"url": "#{gateway}"}>)
+    end)
+  end
+
+  defp endpoint_url(port), do: "http://localhost:#{port}"
 end
