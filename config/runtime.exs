@@ -1,7 +1,7 @@
 import Config
 
 if config_env() == :dev || config_env() == :test do
-  Dotenv.load!()
+  Dotenv.load!([".env", ".env.#{config_env}"])
 end
 
 # These are accessible in code like this:

@@ -17,7 +17,9 @@ defmodule DiscordBot.WebTest do
   end
 
   defp stub_gateway(bypass, gateway) do
-    Bypass.expect(bypass, "GET", "/gateway", fn conn ->
+    Bypass.expect(bypass, "GET", "/gateway", fn (conn = %{req_headers: headers }) ->
+      auth_token = Enum.find(headers, fn({key, _}) -> key == "authorization" end)
+      assert elem(auth_token, 1) == "Bot bananas"
       Plug.Conn.resp(conn, 200, ~s<{"url": "#{gateway}"}>)
     end)
   end
