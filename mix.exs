@@ -26,7 +26,9 @@ defmodule DiscordBot.MixProject do
       {:jason, "~> 1.4"},
       {:dotenv, "~> 3.0.0", only: [:dev, :test]},
       {:mox, "~> 1.0", only: :test},
-      {:bypass, "~> 2.1", only: :test}
+      {:bypass, "~> 2.1", only: :test},
+      {:type_check, "~> 0.12.1"},
+      {:stream_data, "~> 0.5.0", only: :test}
       # {:dep_from_hexpm, "~> 0.3.0"},
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
     ]

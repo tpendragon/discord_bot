@@ -1,8 +1,10 @@
 defmodule DiscordBot.Web do
   @behaviour DiscordBot.WebBehaviour
   use HTTPoison.Base
+  use TypeCheck
 
   @impl true
+  @spec! fetch_websocket_url() :: binary()
   def fetch_websocket_url do
     {:ok, response} = get("/gateway")
     response.body["url"]
