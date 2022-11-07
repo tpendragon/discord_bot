@@ -28,7 +28,8 @@ defmodule DiscordBot.MixProject do
       {:mox, "~> 1.0", only: :test},
       {:bypass, "~> 2.1", only: :test},
       {:type_check, "~> 0.12.1"},
-      {:stream_data, "~> 0.5.0", only: :test}
+      {:stream_data, "~> 0.5.0", only: :test},
+      {:websockex, "~> 0.4.3"}
       # {:dep_from_hexpm, "~> 0.3.0"},
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
     ]

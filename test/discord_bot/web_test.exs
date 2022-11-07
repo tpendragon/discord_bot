@@ -13,7 +13,7 @@ defmodule DiscordBot.WebTest do
 
   test "fetch_websocket_url gets a url" do
     result = DiscordBot.Web.fetch_websocket_url()
-    assert result == "wss://example.com/ws"
+    assert result == "wss://example.com/ws?v=10&encoding=json"
   end
 
   defp stub_gateway(bypass, gateway) do

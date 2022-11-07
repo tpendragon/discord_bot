@@ -1,0 +1,76 @@
+defmodule DiscordBot.Client do
+  use WebSockex
+
+  def start_link(state = %{url: url, token: token}) do
+    state =
+      state |>
+        put_in([:sequence], 0)
+    WebSockex.start_link(url, __MODULE__, state)
+  end
+
+  def handle_frame({:text, msg}, state) do
+    handle_message(msg, state)
+  end
+  def handle_frame({type, msg}, state) do
+    IO.puts "Received Message - Type: #{inspect type} -- Message: #{inspect msg}"
+    {:ok, state}
+  end
+
+  defp handle_message(msg, state) when is_binary(msg) do
+    msg = Jason.decode!(msg)
+    state = update_sequence(msg, state)
+    handle_message(msg, state)
+  end
+  # Hello message
+  defp handle_message(msg = %{"op" => 10, "d" => %{"heartbeat_interval" => heartbeat}}, state) do
+    identify(state)
+  end
+  # Ready event - cache it
+  defp handle_message(%{"op" => 0, "t" => "READY", "d" => msg}, state) do
+    state =
+      state |> put_in([:ready_event], msg)
+    {:ok, state}
+  end
+  defp handle_message(%{"t" => "MESSAGE_CREATE", "d" => %{"channel_id" => channel_id, "id" => message_id, "content" => message}}, state) do
+    handle_created_message(channel_id, message_id, message)
+    {:ok, state}
+  end
+  defp handle_message(msg = %{}, state) do
+    IO.puts "Unhandled message -  #{inspect msg}"
+    {:ok, state}
+  end
+
+  defp handle_created_message(channel_id, message_id, message) do
+    message = String.downcase(message)
+    if(String.contains?(message, "guess what")) do
+      DiscordBot.Web.add_emoji_reaction(channel_id: channel_id, message_id: message_id, emoji: "🐔")
+      DiscordBot.Web.add_emoji_reaction(channel_id: channel_id, message_id: message_id, emoji: "🍑")
+    end
+  end
+
+  defp identify(state = %{token: token}) do
+    identify_event =
+      %{
+        "op" => 2,
+        "d" => %{
+          "token" => token,
+          "intents" => 34312,
+          "properties" => %{
+            "os" => "linux",
+            "browser" => "discordbot",
+            "device" => "discordbot"
+          }
+        }
+      }
+    IO.puts "Identifying"
+    identify_event = Jason.encode!(identify_event)
+    {:reply, {:text, identify_event}, state}
+  end
+
+  # Update sequence
+  defp update_sequence(%{"s" => nil}, state), do: state
+  defp update_sequence(%{"s" => s}, state = %{sequence: sequence}) when s > sequence do
+    state |> put_in([:sequence], s)
+  end
+  defp update_sequence(msg, state), do: state
+end

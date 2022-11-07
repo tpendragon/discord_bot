@@ -7,13 +7,32 @@ defmodule DiscordBot.Web do
   @spec! fetch_websocket_url() :: binary()
   def fetch_websocket_url do
     {:ok, response} = get("/gateway")
-    response.body["url"]
+    # Best practice to include API version.
+    "#{response.body["url"]}?v=10&encoding=json"
+  end
+
+  def add_emoji_reaction(channel_id: channel_id, message_id: message_id, emoji: emoji) do
+    # /channels/{channel.id}/messages/{message.id}/reactions/{emoji}/@me
+    {:ok, response} = put("/channels/#{channel_id}/messages/#{message_id}/reactions/#{URI.encode(emoji)}/@me")
+    headers = response.headers |> Map.new
+    IO.inspect(Map.fetch(headers, "retry-after"))
+    case Map.fetch(headers, "retry-after") do
+      {:ok, val} ->
+        IO.inspect(Integer.parse(val))
+        val = val |> Integer.parse |> elem(0)
+        :timer.apply_after(val*100, DiscordBot.Web, :add_emoji_reaction, [[channel_id: channel_id, message_id: message_id, emoji: emoji]])
+      _ ->
+    end
   end
 
   @impl true
   def process_response_body(body) do
-    body
-    |> Jason.decode!()
+    if(body != "") do
+      body
+      |> Jason.decode!()
+    else
+      %{}
+    end
   end
 
   @impl true
