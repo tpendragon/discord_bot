@@ -5,7 +5,11 @@ defmodule DiscordBot.Client do
     state =
       state |>
         put_in([:sequence], 0)
-    WebSockex.start_link(url, __MODULE__, state)
+    websocket_client().start_link(url, __MODULE__, state)
+  end
+
+  defp websocket_client() do
+    Application.fetch_env!(:discord_bot, :websocket_client)
   end
 
   def handle_frame({:text, msg}, state) do
