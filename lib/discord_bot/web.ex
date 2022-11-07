@@ -20,7 +20,7 @@ defmodule DiscordBot.Web do
   end
 
   defp discord_base_url do
-    "https://discord.com/api/v10"
+    Application.get_env(:discord_bot, :discord_base_url, "https://discord.com/api/v10")
   end
 
   defp bot_token do

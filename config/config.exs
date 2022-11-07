@@ -3,3 +3,5 @@ import Config
 # Application.fetch_env!(:discord_bot, :bot_token)
 config :discord_bot,
   http_client: DiscordBot.Web
+
+import_config "#{config_env()}.exs"
