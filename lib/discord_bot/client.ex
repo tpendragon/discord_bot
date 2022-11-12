@@ -15,10 +15,6 @@ defmodule DiscordBot.Client do
   def handle_frame({:text, msg}, state) do
     handle_message(msg, state)
   end
-  def handle_frame({type, msg}, state) do
-    IO.puts "Received Message - Type: #{inspect type} -- Message: #{inspect msg}"
-    {:ok, state}
-  end
 
   defp handle_message(msg, state) when is_binary(msg) do
     msg = Jason.decode!(msg)
@@ -66,7 +62,6 @@ defmodule DiscordBot.Client do
           }
         }
       }
-    IO.puts "Identifying"
     identify_event = Jason.encode!(identify_event)
     {:reply, {:text, identify_event}, state}
   end
