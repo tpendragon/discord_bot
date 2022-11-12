@@ -43,8 +43,8 @@ defmodule DiscordBot.Client do
   defp handle_created_message(channel_id, message_id, message) do
     message = String.downcase(message)
     if(String.contains?(message, "guess what")) do
-      DiscordBot.Web.add_emoji_reaction(channel_id: channel_id, message_id: message_id, emoji: "🐔")
-      DiscordBot.Web.add_emoji_reaction(channel_id: channel_id, message_id: message_id, emoji: "🍑")
+      http_client().add_emoji_reaction(channel_id: channel_id, message_id: message_id, emoji: "🐔")
+      http_client().add_emoji_reaction(channel_id: channel_id, message_id: message_id, emoji: "🍑")
     end
   end
 
@@ -72,4 +72,8 @@ defmodule DiscordBot.Client do
     state |> put_in([:sequence], s)
   end
   defp update_sequence(msg, state), do: state
+
+  defp http_client() do
+    Application.fetch_env!(:discord_bot, :http_client)
+  end
 end

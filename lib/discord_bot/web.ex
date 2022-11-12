@@ -11,6 +11,7 @@ defmodule DiscordBot.Web do
     "#{response.body["url"]}?v=10&encoding=json"
   end
 
+  @impl true
   def add_emoji_reaction(channel_id: channel_id, message_id: message_id, emoji: emoji) do
     # /channels/{channel.id}/messages/{message.id}/reactions/{emoji}/@me
     {:ok, response} = put("/channels/#{channel_id}/messages/#{message_id}/reactions/#{URI.encode(emoji)}/@me")

@@ -15,10 +15,10 @@ defmodule DiscordBot.ClientTest do
     state = Agent.get(DiscordBot.Client, & &1)
     msg = %{
       "op" => 10,
-      "s" => 1,
+      "s" => nil,
       "d" => %{"heartbeat_interval" => 100}
     }
-    {:reply, {:text, msg}, state} = Client.handle_frame({:text, Jason.encode!(msg)}, state)
+    {:reply, {:text, msg}, _state} = Client.handle_frame({:text, Jason.encode!(msg)}, state)
     msg = Jason.decode!(msg)
     assert msg["op"] == 2
     assert msg["d"]["token"] == "bananas"
@@ -30,10 +30,25 @@ defmodule DiscordBot.ClientTest do
     msg = %{
       "op" => 0,
       "t" => "READY",
-      "s" => 1,
       "d" => %{"stuff" => "other stuff"}
     }
     {:ok, state} = Client.handle_frame({:text, Jason.encode!(msg)}, state)
     assert state.ready_event == %{"stuff" => "other stuff"}
+  end
+
+  test "creates emojis when saying 'guess what'" do
+    state = Agent.get(DiscordBot.Client, & &1)
+    msg = %{
+      "t" => "MESSAGE_CREATE",
+      "s" => 1,
+      "d" => %{
+        "channel_id" => "12",
+        "id" => "30",
+        "content" => "Hey Guess WhAt"
+      }
+    }
+    {:ok, _state} = Client.handle_frame({:text, Jason.encode!(msg)}, state)
+    assert_received {:add_emoji_reaction, [channel_id: _, message_id: _, emoji: "🐔"]}
+    assert_received {:add_emoji_reaction, [channel_id: _, message_id: _, emoji: "🍑"]}
   end
 end
