@@ -16,10 +16,8 @@ defmodule DiscordBot.Web do
     # /channels/{channel.id}/messages/{message.id}/reactions/{emoji}/@me
     {:ok, response} = put("/channels/#{channel_id}/messages/#{message_id}/reactions/#{URI.encode(emoji)}/@me")
     headers = response.headers |> Map.new
-    IO.inspect(Map.fetch(headers, "retry-after"))
     case Map.fetch(headers, "retry-after") do
       {:ok, val} ->
-        IO.inspect(Integer.parse(val))
         val = val |> Integer.parse |> elem(0)
         :timer.apply_after(val*100, DiscordBot.Web, :add_emoji_reaction, [[channel_id: channel_id, message_id: message_id, emoji: emoji]])
       _ ->
