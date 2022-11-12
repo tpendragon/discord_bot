@@ -29,7 +29,7 @@ defmodule DiscordBot.WebTest do
     Bypass.expect_once(bypass, "PUT", "/channels/1/messages/2/reactions/%F0%9F%90%94/@me", fn (conn = %{req_headers: headers }) ->
       auth_token = Enum.find(headers, fn({key, _}) -> key == "authorization" end)
       assert elem(auth_token, 1) == "Bot bananas"
-      Plug.Conn.resp(conn, 200, ~s<{}>)
+      Plug.Conn.resp(conn, 200, "")
     end)
 
     result = DiscordBot.Web.add_emoji_reaction(channel_id: "1", message_id: "2", emoji: "🐔")
