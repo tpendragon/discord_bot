@@ -1,6 +1,6 @@
 defmodule DiscordBot.ClientTest do
   alias DiscordBot.Client
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   doctest DiscordBot.Web
   use TypeCheck.ExUnit
 

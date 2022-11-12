@@ -1,5 +1,5 @@
 defmodule DiscordBot.WebTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   doctest DiscordBot.Web
   use TypeCheck.ExUnit
   setup do
