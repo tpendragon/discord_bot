@@ -24,6 +24,20 @@ defmodule DiscordBot.Web do
     end
   end
 
+  def create_ping_command(application_id: application_id) do
+    # "/applications/<my_application_id>/commands"
+    {:ok, response} = post("/applications/#{application_id}/commands", %{name: "ping", description: "yes"} |> Jason.encode!, [{"Content-Type", "application/json"}])
+  end
+
+  def respond_to_interaction(interaction_id: interaction_id, interaction_token: interaction_token) do
+    # /interactions/<interaction_id>/<interaction_token>/callback
+    response_json = %{"type" => 4, "data" => %{"content": "Pong!"}}
+    url = "/interactions/#{interaction_id}/#{interaction_token}/callback"
+    IO.inspect(url)
+    {:ok, response} = post(url, Jason.encode!(response_json), [{"Content-Type", "application/json"}])
+    IO.inspect(response)
+  end
+
   @impl true
   def process_response_body(body) do
     if(body != "") do
