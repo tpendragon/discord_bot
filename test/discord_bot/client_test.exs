@@ -36,6 +36,20 @@ defmodule DiscordBot.ClientTest do
     assert state.ready_event == %{"stuff" => "other stuff"}
   end
 
+  test "doesn't error when sending an unknown message" do
+    state = Agent.get(DiscordBot.Client, & &1)
+    msg = %{
+      "t" => "DUNNO",
+      "s" => 1,
+      "d" => %{
+        "channel_id" => "12",
+        "id" => "30",
+        "content" => "Hey Guess WhAt"
+      }
+    }
+    {:ok, _state} = Client.handle_frame({:text, Jason.encode!(msg)}, state)
+  end
+
   test "creates emojis when saying 'guess what'" do
     state = Agent.get(DiscordBot.Client, & &1)
     msg = %{

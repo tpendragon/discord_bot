@@ -10,7 +10,7 @@ defmodule DiscordBot.Application do
     children = [
       # Starts a worker by calling: DiscordBot.Worker.start_link(arg)
       # {DiscordBot.Worker, arg}
-      { DiscordBot.Client, %{ url: Application.fetch_env!(:discord_bot, :http_client).fetch_websocket_url() , token: Application.fetch_env!(:discord_bot, :bot_token)} }
+      { DiscordBot.Client, %{ url: Application.fetch_env!(:discord_bot, :http_client).fetch_websocket_url() , token: Application.fetch_env!(:discord_bot, :bot_token), message_handler: DiscordBot.MessageHandler} }
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

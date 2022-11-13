@@ -1,7 +1,7 @@
 defmodule DiscordBot.Client do
   use WebSockex
 
-  def start_link(state = %{url: url, token: _token}) do
+  def start_link(state = %{url: url, token: _token, message_handler: _}) do
     state =
       state |>
         put_in([:sequence], 0)
@@ -31,21 +31,13 @@ defmodule DiscordBot.Client do
       state |> put_in([:ready_event], msg)
     {:ok, state}
   end
-  defp handle_message(%{"t" => "MESSAGE_CREATE", "d" => %{"channel_id" => channel_id, "id" => message_id, "content" => message}}, state) do
-    handle_created_message(channel_id, message_id, message)
-    {:ok, state}
-  end
-  defp handle_message(msg = %{}, state) do
-    IO.puts "Unhandled message -  #{inspect msg}"
-    {:ok, state}
-  end
-
-  defp handle_created_message(channel_id, message_id, message) do
-    message = String.downcase(message)
-    if(String.contains?(message, "guess what")) do
-      http_client().add_emoji_reaction(channel_id: channel_id, message_id: message_id, emoji: "🐔")
-      http_client().add_emoji_reaction(channel_id: channel_id, message_id: message_id, emoji: "🍑")
+  defp handle_message(msg, state = %{message_handler: message_handler}) do
+    try do
+      message_handler.handle_message(msg)
+    rescue
+      e in FunctionClauseError -> IO.puts "Unhandled message - #{inspect msg}"
     end
+    {:ok, state}
   end
 
   defp identify(state = %{token: token}) do
@@ -72,8 +64,4 @@ defmodule DiscordBot.Client do
     state |> put_in([:sequence], s)
   end
   defp update_sequence(_msg, state), do: state
-
-  defp http_client() do
-    Application.fetch_env!(:discord_bot, :http_client)
-  end
 end
