@@ -1,7 +1,7 @@
 defmodule DiscordBot.Client do
   use WebSockex
 
-  def start_link(state = %{url: url, token: token}) do
+  def start_link(state = %{url: url, token: _token}) do
     state =
       state |>
         put_in([:sequence], 0)
@@ -22,7 +22,7 @@ defmodule DiscordBot.Client do
     handle_message(msg, state)
   end
   # Hello message
-  defp handle_message(msg = %{"op" => 10, "d" => %{"heartbeat_interval" => heartbeat}}, state) do
+  defp handle_message(%{"op" => 10, "d" => %{"heartbeat_interval" => _heartbeat}}, state) do
     identify(state)
   end
   # Ready event - cache it
@@ -71,7 +71,7 @@ defmodule DiscordBot.Client do
   defp update_sequence(%{"s" => s}, state = %{sequence: sequence}) when s > sequence do
     state |> put_in([:sequence], s)
   end
-  defp update_sequence(msg, state), do: state
+  defp update_sequence(_msg, state), do: state
 
   defp http_client() do
     Application.fetch_env!(:discord_bot, :http_client)

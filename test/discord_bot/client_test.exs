@@ -48,7 +48,7 @@ defmodule DiscordBot.ClientTest do
       }
     }
     {:ok, _state} = Client.handle_frame({:text, Jason.encode!(msg)}, state)
-    assert_received {:add_emoji_reaction, [channel_id: _, message_id: _, emoji: "🐔"]}
-    assert_received {:add_emoji_reaction, [channel_id: _, message_id: _, emoji: "🍑"]}
+    assert_receive {:add_emoji_reaction, [channel_id: _, message_id: _, emoji: "🐔"]}
+    assert_receive {:add_emoji_reaction, [channel_id: _, message_id: _, emoji: "🍑"]}
   end
 end
